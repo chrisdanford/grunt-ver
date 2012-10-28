@@ -30,7 +30,7 @@ In your `grunt.js` file, add the follow task entry:
 
 ```js
 version: {
-  webapp: {
+  myapp: {
     phases: [
       {
         files: [
@@ -40,6 +40,27 @@ version: {
           'css/*.css'
         ]
       },
+      {
+        files: [
+          'css/*.css',
+          'js/*.js'
+        ]
+      }
+    ],
+    version: 'build/version.json'
+  }
+}
+```
+
+## Force Version
+
+You can force the version string to all files to a particular value using the forceversion option.  This is useful for development environments where stable file names are helpful for debugging and where cache busting isn't an issue.
+
+```js
+version: {
+  myapp: {
+    forceVersion: "dev"
+    phases: [
       {
         files: [
           'css/*.css',

@@ -29,7 +29,12 @@ module.exports = function(grunt) {
         es5: true
       },
       globals: {}
-    }
+    },
+    exec: {
+      publish: {
+        command: 'npm publish .'
+      },
+    },
   });
 
   // Load local tasks.
