@@ -25,11 +25,11 @@ module.exports = function(grunt) {
       grunt.log.writeln('Versioning files.');
       grunt.file.expandFiles(files).forEach(function(f) {
         var version = forceVersion || grunt.helper('hash', f).slice(0, 8),
-          qs = queryString ? true : false, // switch between the "queryString" and "fileName" modes
           basename = path.basename(f),
           parts = basename.split('.'),
           renamedBasename,
           renamedPath;
+        qs = queryString ? true : false; // switch between the "queryString" and "fileName" modes
 
         if (qs) {
           // inject the version as a querystring after the file name
