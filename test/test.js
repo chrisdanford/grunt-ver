@@ -1,4 +1,7 @@
 var grunt = require('grunt');
+var wrench = require('wrench');
+
+require("../tasks/ver")(grunt);
 
 /*
   ======== A Handy Little Nodeunit Reference ========
@@ -22,12 +25,26 @@ var grunt = require('grunt');
 
 exports['ver'] = {
   setUp: function(done) {
-    // setup here
+    wrench.copyDirSyncRecursive('test-data/in', 'test-data/out');
     done();
   },
   'helper': function(test) {
-    //test.expect(1);
-    //test.equal(grunt.helper('ver'), 'ver!!!', 'should return the correct value.');
+    test.expect(1);
+    grunt.helper('ver',
+      [
+        {
+          files: ['test-data/out/**/*.{js,png}'],
+          references: ['test-data/out/**/*.css'],
+        },
+        {
+          files: ['test-data/out/**/*.css'],
+        },
+      ],
+      'test-data/out/version.json',
+      'dev'  // `undefined` to use default value
+    );
+    
+    test.equal(grunt.file.expandFiles('test-data/out/**').length, 4);
     test.done();
   }
 };

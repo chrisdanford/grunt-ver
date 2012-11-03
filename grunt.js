@@ -26,7 +26,8 @@ module.exports = function(grunt) {
         boss: true,
         eqnull: true,
         node: true,
-        es5: true
+        es5: true,
+        strict: false,
       },
       globals: {}
     },
@@ -37,10 +38,12 @@ module.exports = function(grunt) {
     },
   });
 
+  grunt.loadNpmTasks('grunt-bump');
+
   // Load local tasks.
   grunt.loadTasks('tasks');
 
   // Default task.
-  grunt.registerTask('default', 'test'); //'lint test');
+  grunt.registerTask('default', 'lint test bump');
 
 };
