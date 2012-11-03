@@ -9,20 +9,22 @@ var fs = require('fs'),
 
 module.exports = function(grunt) {
   grunt.registerMultiTask('ver', 'Add hashes to file names and update references to renamed files', function() {
-    grunt.helper('ver', this.data.forceVersion, this.data.phases, this.data.version);
+    grunt.helper('ver', this.data.phases, this.data.version, this.data.forceVersion);
   });
 
   // Expose as a helper for possible consumption by other tasks.
-  grunt.registerHelper('ver', function(forceVersion, phases, versionFilePath) {
+  grunt.registerHelper('ver', function(phases, versionFilePath, forceVersion) {
+    grunt.verbose.or.writeln('Run with --verbose for details.');
     var versions = {},  // map from original file name to version info
       simpleVersions = {};
 
     phases.forEach(function(phase) {
       var files = phase.files, 
-        references = phase.references;
+        references = phase.references,
+        numFilesRenamed = 0;
 
-      grunt.log.writeln('Versioning files.');
-      grunt.file.expandFiles(files).forEach(function(f) {
+      grunt.log.writeln('Versioning files.').writeflags(files);
+      grunt.file.expandFiles(files).sort().forEach(function(f) {
         var version = forceVersion || grunt.helper('hash', f).slice(0, 8),
           basename = path.basename(f),
           parts = basename.split('.'),
@@ -36,7 +38,7 @@ module.exports = function(grunt) {
         renamedPath = path.join(path.dirname(f), renamedBasename);
 
         fs.renameSync(f, renamedPath);
-        grunt.log.write(f + ' ').ok(renamedBasename);
+        grunt.verbose.write(f + ' ').ok(renamedBasename);
 
         versions[f] = {
           basename: basename,
@@ -45,18 +47,22 @@ module.exports = function(grunt) {
           renamedPath: renamedPath,
         };
         simpleVersions[f] = renamedPath;
+        numFilesRenamed++;
       });
+      grunt.log.write('Renamed ' + numFilesRenamed + ' files ').ok();
 
       if (references) {
-        grunt.log.writeln('Replacing instances.');
-        grunt.file.expandFiles(references).forEach(function(f) {
+        var totalReferences = 0;
+        var totalReferencingFiles = 0;
+        grunt.log.writeln('Replacing references.').writeflags(references);
+        grunt.file.expandFiles(references).sort().forEach(function(f) {
           var content = grunt.file.read(f).toString(),
             replacedToCount = {},
             replacedKeys;
 
           Object.keys(versions).forEach(function(key) {
             var to = versions[key],
-              regex = new RegExp(to.basename,"g")
+              regex = new RegExp(to.basename,"g");
             content = content.replace(regex, function(match) {
               if (match in replacedToCount) {
                 replacedToCount[match]++;
@@ -70,9 +76,12 @@ module.exports = function(grunt) {
           replacedKeys = Object.keys(replacedToCount);
           if (replacedKeys.length > 0) {
             grunt.file.write(f, content);
-            grunt.log.write(f + ' ').ok('replaced: ' + replacedKeys.join(', '));
+            grunt.verbose.write(f + ' ').ok('replaced: ' + replacedKeys.join(', '));
+            totalReferences++;
           }
+          totalReferencingFiles++;
         });
+        grunt.log.write('Replaced ' + totalReferences + ' in ' + totalReferencingFiles + ' files ').ok();
       }
     });
 
