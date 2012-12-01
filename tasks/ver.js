@@ -62,7 +62,8 @@ module.exports = function(grunt) {
 
           Object.keys(versions).forEach(function(key) {
             var to = versions[key],
-              regex = new RegExp(to.basename,"g");
+              regex = new RegExp('\\b' + to.basename + '\\b', 'g');
+
             content = content.replace(regex, function(match) {
               if (match in replacedToCount) {
                 replacedToCount[match]++;
@@ -99,12 +100,9 @@ module.exports = function(grunt) {
     encoding = encoding || 'hex';
     var hash = crypto.createHash(algorithm);
 
-    grunt.log.verbose.write('Hashing ' + filePath + '.');
+    grunt.log.verbose.writeln('Hashing ' + filePath + '.');
     hash.update(grunt.file.read(filePath));
     return hash.digest(encoding);
   });
 
 };
-
-
-
