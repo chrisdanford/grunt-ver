@@ -44,7 +44,7 @@ module.exports = function(grunt) {
           basename: basename,
           version: version,
           renamedBasename: renamedBasename,
-          renamedPath: renamedPath,
+          renamedPath: renamedPath
         };
         simpleVersions[f] = renamedPath;
         numFilesRenamed++;
@@ -62,7 +62,8 @@ module.exports = function(grunt) {
 
           Object.keys(versions).forEach(function(key) {
             var to = versions[key],
-              regex = new RegExp('\\b' + to.basename + '\\b', 'g');
+            escapedBase = to.basename.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&"),
+            regex = new RegExp('\\b' + escapedBase + '\\b', 'g');
 
             content = content.replace(regex, function(match) {
               if (match in replacedToCount) {
