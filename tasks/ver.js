@@ -28,7 +28,8 @@ module.exports = function(grunt) {
           basename = path.basename(f),
           parts = basename.split('.'),
           renamedBasename,
-          renamedPath;
+          renamedPath,
+          standardizedRenamedPath;
         qs = queryString ? true : false; // switch between the "queryString" and "fileName" modes
 
         if (qs) {
@@ -40,6 +41,7 @@ module.exports = function(grunt) {
           renamedBasename = parts.join('.');
         }
         renamedPath = path.join(path.dirname(f), renamedBasename);
+        standardizedRenamedPath = renamedPath.replace(/\\/g, '/'); // Convert Windows separators if any
 
         if (!qs) fs.renameSync(f, renamedPath);
 
@@ -49,9 +51,9 @@ module.exports = function(grunt) {
           basename: basename,
           version: version,
           renamedBasename: renamedBasename,
-          renamedPath: renamedPath
+          renamedPath: standardizedRenamedPath
         };
-        simpleVersions[f] = renamedPath;
+        simpleVersions[f] = standardizedRenamedPath;
       });
 
       if (references) {
