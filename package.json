@@ -1,7 +1,7 @@
 {
   "name": "grunt-ver",
   "description": "Add hashes to file names and update references to renamed files",
-  "version": "0.1.4",
+  "version": "0.4.0",
   "homepage": "https://github.com/chrisdanford/grunt-ver",
   "author": {
     "name": "Chris Danford",
@@ -17,7 +17,7 @@
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/buunguyen/grunt-mindirect/blob/master/LICENSE-MIT"
+      "url": "https://github.com/chrisdanford/grunt-ver/blob/master/LICENSE-MIT"
     }
   ],
   "main": "tasks/grunt-ver",
@@ -25,7 +25,7 @@
     "node": ">=0.6.0"
   },
   "devDependencies": {
-    "grunt": "0.3.x"
+    "grunt": "~0.4.0"
   },
   "keywords": [
     "gruntplugin"
