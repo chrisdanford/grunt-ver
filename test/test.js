@@ -1,14 +1,23 @@
 var grunt = require('grunt');
-var wrench = require('wrench');
 
 exports.ver = {
-  setUp: function(done) {
-    wrench.copyDirSyncRecursive('test/fixtures/src', 'test/fixtures/processed');
-    done();
+  'file count is sane': function(test) {
+    test.expect(1);
+    test.equal(grunt.file.expand({filter: 'isFile'}, 'test/fixtures/out/**').length, 4);
+    test.done();
   },
-  'helper': function(test) {
-    test.expect(1);    
-    test.equal(grunt.file.expand('test/fixtures/processed/**').length, 4);
+  'replacement occurs': function(test) {
+    test.expect(1);
+    var contents = grunt.file.read('test/fixtures/out/static/foo.dev.css');
+    var matches = contents.match(/foo\.dev/g);
+    test.equal(matches.length, 6);
+    test.done();
+  },
+  'versions are correct': function(test) {
+    test.expect(1);
+    var contents = grunt.file.read('test/fixtures/out/version.json');
+    var versions = JSON.parse(contents);
+    test.equal(grunt.util._.keys(versions).length, 3);
     test.done();
   }
 };

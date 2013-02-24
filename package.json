@@ -30,6 +30,7 @@
   "devDependencies": {
     "grunt": "~0.4.0",
     "grunt-contrib-clean": "~0.4.0a",
+    "grunt-contrib-copy": "~0.4.0",
     "grunt-contrib-jshint": "~0.1.1",
     "grunt-contrib-nodeunit": "~0.1.2",
     "grunt-bump": "~0.0.2",

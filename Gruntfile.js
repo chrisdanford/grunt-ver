@@ -29,7 +29,7 @@ module.exports = function(grunt) {
 
     clean: {
       test: [
-        'test/fixtures/processed'
+        'test/fixtures/out'
       ]
     },
 
@@ -45,18 +45,31 @@ module.exports = function(grunt) {
       }
     },
 
+    copy: {
+      main: {
+        files: [
+          {
+            expand: true,
+            cwd: 'test/fixtures/src/',
+            src: ['**'],
+            dest: 'test/fixtures/out/'
+          }
+        ]
+      }
+    },
+
     ver: {
       test: {
         phases: [
           {
-            files: ['test/fixtures/processed/**/*.{js,png}'],
-            references: ['test/fixtures/processed/**/*.css'],
+            files: ['test/fixtures/out/**/*.{js,png}'],
+            references: ['test/fixtures/out/**/*.css'],
           },
           {
-            files: ['test/fixtures/processed/**/*.css'],
+            files: ['test/fixtures/out/**/*.css'],
           }
         ],
-        version: 'test/fixtures/processed/version.json',
+        version: 'test/fixtures/out/version.json',
         forceVersion: 'dev'
       }
     }
@@ -68,16 +81,18 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-bump');
   grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-nodeunit');
   grunt.loadNpmTasks('grunt-exec');
 
   grunt.registerTask('default', [
     'jshint',
-    'ver',
     'clean',
-    'nodeunit',
-    'clean' // clean after so that temporary files don't hang around
+    'copy',
+    'ver',
+    'nodeunit', // verify the results of the 'ver' task
+    'clean' // clean up temporary files
   ]);
   grunt.registerTask('publish', [
     'default',

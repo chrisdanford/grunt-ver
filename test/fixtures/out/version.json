@@ -1,0 +1,5 @@
+{
+ "test/fixtures/out/static/foo.js": "test/fixtures/out/static/foo.dev.js",
+ "test/fixtures/out/static/foo.png": "test/fixtures/out/static/foo.dev.png",
+ "test/fixtures/out/static/foo.css": "test/fixtures/out/static/foo.dev.css"
+}
