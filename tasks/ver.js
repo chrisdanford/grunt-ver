@@ -8,12 +8,14 @@ var fs = require('fs'),
   crypto = require('crypto');
 
 module.exports = function(grunt) {
+  var ver, hash;
+
   grunt.registerMultiTask('ver', 'Add hashes to file names and update references to renamed files', function() {
     ver(this.data.phases, this.data.version, this.data.forceVersion);
   });
 
-  // Expose as a helper for possible consumption by other tasks.
-  function ver(phases, versionFilePath, forceVersion) {
+  // TODO: Expose as a helper for possible consumption by other tasks.
+  ver = function(phases, versionFilePath, forceVersion) {
     grunt.verbose.or.writeln('Run with --verbose for details.');
     var versions = {},  // map from original file name to version info
       simpleVersions = {};
@@ -91,11 +93,11 @@ module.exports = function(grunt) {
       grunt.file.write(versionFilePath, JSON.stringify(simpleVersions, null, ' '));
       grunt.log.write(versionFilePath + ' ').ok();
     }
-  }
+  };
 
 
   // This helper is a basic wrapper around crypto.createHash.
-  function hash(filePath, algorithm, encoding) {
+  hash = function(filePath, algorithm, encoding) {
     algorithm = algorithm || 'md5';
     encoding = encoding || 'hex';
     var hash = crypto.createHash(algorithm);
@@ -103,6 +105,6 @@ module.exports = function(grunt) {
     grunt.log.verbose.writeln('Hashing ' + filePath + '.');
     hash.update(grunt.file.read(filePath));
     return hash.digest(encoding);
-  }
+  };
 
 };
