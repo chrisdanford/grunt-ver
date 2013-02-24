@@ -1,8 +1,0 @@
-body {
-    background-image: url('foo.dev.png');
-    background-image: url(foo.dev.png);
-    background-image: url("foo.dev.png");
-    background-image: url('image/foo.dev.png');
-    background-image: url(image/foo.dev.png);
-    background-image: url("image/foo.dev.png");
-}
