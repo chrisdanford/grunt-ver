@@ -62,7 +62,7 @@ module.exports = function(grunt) {
       test: {
         phases: [
           {
-            files: ['test/fixtures/out/**/*.{js,png}'],
+            files: ['test/fixtures/out/**/*.{js,png}', '!test/fixtures/out/**/international.js'],
             references: ['test/fixtures/out/**/*.css'],
           },
           {
@@ -71,6 +71,14 @@ module.exports = function(grunt) {
         ],
         version: 'test/fixtures/out/version.json',
         forceVersion: 'dev'
+      },
+      international: {
+        phases: [
+          {
+            files: ['test/fixtures/out/**/international.js']
+          }
+        ],
+        version: 'test/fixtures/out/international.json',
       }
     }
 

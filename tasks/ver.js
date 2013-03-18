@@ -21,7 +21,7 @@ module.exports = function(grunt) {
       simpleVersions = {};
 
     phases.forEach(function(phase) {
-      var files = phase.files, 
+      var files = phase.files,
         references = phase.references,
         numFilesRenamed = 0;
 
@@ -97,13 +97,14 @@ module.exports = function(grunt) {
 
 
   // This helper is a basic wrapper around crypto.createHash.
-  hash = function(filePath, algorithm, encoding) {
+  hash = function(filePath, algorithm, encoding, fileEncoding) {
     algorithm = algorithm || 'md5';
     encoding = encoding || 'hex';
+    fileEncoding = fileEncoding || 'utf8';
     var hash = crypto.createHash(algorithm);
 
     grunt.log.verbose.writeln('Hashing ' + filePath + '.');
-    hash.update(grunt.file.read(filePath));
+    hash.update(grunt.file.read(filePath), fileEncoding);
     return hash.digest(encoding);
   };
 
