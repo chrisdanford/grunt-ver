@@ -11,17 +11,18 @@ module.exports = function(grunt) {
   var ver, hash;
 
   grunt.registerMultiTask('ver', 'Add hashes to file names and update references to renamed files', function() {
-    ver(this.data.phases, this.data.version, this.data.forceVersion);
+    ver(this.data.queryString, this.data.phases, this.data.version, this.data.forceVersion);
   });
 
   // TODO: Expose as a helper for possible consumption by other tasks.
-  ver = function(phases, versionFilePath, forceVersion) {
+  ver = function(queryString, phases, versionFilePath, forceVersion) {
     grunt.verbose.or.writeln('Run with --verbose for details.');
     var versions = {},  // map from original file name to version info
-      simpleVersions = {};
+      simpleVersions = {},
+      qs = false;
 
     phases.forEach(function(phase) {
-      var files = phase.files, 
+      var files = phase.files,
         references = phase.references,
         numFilesRenamed = 0;
 
@@ -31,24 +32,32 @@ module.exports = function(grunt) {
           basename = path.basename(f),
           parts = basename.split('.'),
           renamedBasename,
-          renamedPath;
+          renamedPath,
+          standardizedRenamedPath;
+          qs = queryString ? true : false; // switch between the "queryString" and "fileName" modes
 
-        // inject the version just before the file extension
-        parts.splice(parts.length-1, 0, version);
-
-        renamedBasename = parts.join('.');
+        if (qs) {
+          // inject the version as a querystring after the file name
+          renamedBasename = basename + '?' + version;
+        } else {
+          // inject the version just before the file extension
+          parts.splice(parts.length-1, 0, version);
+          renamedBasename = parts.join('.');
+        }
         renamedPath = path.join(path.dirname(f), renamedBasename);
+        standardizedRenamedPath = renamedPath.replace(/\\/g, '/'); // Convert Windows separators if any
 
-        fs.renameSync(f, renamedPath);
+        if (!qs) fs.renameSync(f, renamedPath);
+
         grunt.verbose.write(f + ' ').ok(renamedBasename);
 
         versions[f] = {
           basename: basename,
           version: version,
           renamedBasename: renamedBasename,
-          renamedPath: renamedPath,
+          renamedPath: standardizedRenamedPath
         };
-        simpleVersions[f] = renamedPath;
+        simpleVersions[f] = standardizedRenamedPath;
         numFilesRenamed++;
       });
       grunt.log.write('Renamed ' + numFilesRenamed + ' files ').ok();
@@ -64,8 +73,7 @@ module.exports = function(grunt) {
 
           Object.keys(versions).forEach(function(key) {
             var to = versions[key],
-              regex = new RegExp('\\b' + to.basename + '\\b', 'g');
-
+              regex = new RegExp('\\b' + to.basename + (qs ? '(?!\\?)' : '') + '\\b', 'g'); // in queryString mode, ignore the instances that already have a queryString
             content = content.replace(regex, function(match) {
               if (match in replacedToCount) {
                 replacedToCount[match]++;
