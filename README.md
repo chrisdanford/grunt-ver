@@ -1,5 +1,8 @@
 # grunt-ver
-A [Grunt](https://github.com/cowboy/grunt) [multi-task](https://github.com/cowboy/grunt/blob/master/docs/types_of_tasks.md) that does 3 things:
+
+**0.1.x was the last version of this plugin that supported Grunt 0.3.x.**
+
+A [Grunt](https://github.com/cowboy/grunt) 0.4 [multi-task](https://github.com/cowboy/grunt/blob/master/docs/types_of_tasks.md) that does 3 things:
 
 1. Renames files in-place to add a version tag that a hash of the contents.
 
