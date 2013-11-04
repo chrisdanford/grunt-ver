@@ -23,16 +23,16 @@ finalized.
 ## Getting Started
 Install the module with: `npm install grunt-ver`
 
-Then load it from your `grunt.js` file:
+Then load it from your `Gruntfile.js`:
 
 ```js
 grunt.loadNpmTasks('grunt-ver');
 ```
 
-In your `grunt.js` file, add the follow task entry:
+In your `Gruntfile.js`, add the follow task entry:
 
 ```js
-version: {
+ver: {
   myapp: {
     phases: [
       {
@@ -60,7 +60,7 @@ version: {
 You can force the version string to all files to a particular value using the forceversion option.  This is useful for development environments where stable file names are helpful for debugging and where cache busting isn't an issue.
 
 ```js
-version: {
+ver: {
   myapp: {
     forceVersion: "dev"
     phases: [
