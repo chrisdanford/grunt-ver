@@ -1,7 +1,7 @@
 {
   "name": "grunt-ver",
   "description": "Add hashes to file names and update references to renamed files",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "homepage": "https://github.com/chrisdanford/grunt-ver",
   "author": {
     "name": "Chris Danford",
@@ -28,18 +28,20 @@
     "test": "grunt nodeunit -v"
   },
   "devDependencies": {
-    "grunt": "~0.4.0",
-    "grunt-contrib-clean": "~0.4.0a",
-    "grunt-contrib-copy": "~0.4.0",
-    "grunt-contrib-jshint": "~0.1.1",
-    "grunt-contrib-nodeunit": "~0.1.2",
-    "grunt-bump": "~0.0.2",
-    "grunt-exec": "~0.4.0",
-    "wrench": "~1.4.4"
+    "grunt": "~0.4.2",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-copy": "~0.5.0",
+    "grunt-contrib-jshint": "~0.8.0",
+    "grunt-contrib-nodeunit": "~0.3.0",
+    "grunt-bump": "0.0.13",
+    "grunt-exec": "~0.4.3",
+    "wrench": "~1.5.6",
+    "lodash": "~2.4.1"
   },
   "keywords": [
     "gruntplugin",
     "version",
-    "file name"
+    "file name",
+    "cdn"
   ]
 }

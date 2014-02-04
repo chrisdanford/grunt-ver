@@ -11,17 +11,22 @@ module.exports = function(grunt) {
   var ver, hash;
 
   grunt.registerMultiTask('ver', 'Add hashes to file names and update references to renamed files', function() {
-    ver(this.data.phases, this.data.version, this.data.forceVersion);
+    var versionFile = this.data.versionFile || this.data.version;  // "version" is the pre 0.3 option name
+    if (!versionFile) {
+      grunt.warn('The option "versionFile" is required.');
+      return;
+    }
+    var baseDir = this.data.baseDir || path.dirname(versionFile);
+    ver(this.data.phases, versionFile, baseDir, this.data.forceVersion);
   });
 
-  // TODO: Expose as a helper for possible consumption by other tasks.
-  ver = function(phases, versionFilePath, forceVersion) {
+  ver = function(phases, versionFilePath, baseDir, forceVersion) {
     grunt.verbose.or.writeln('Run with --verbose for details.');
-    var versions = {},  // map from original file name to version info
-      simpleVersions = {};
+    var versions = {};  // map from original file name to version info
+    var outputVersions = {};
 
     phases.forEach(function(phase) {
-      var files = phase.files, 
+      var files = phase.files,
         references = phase.references,
         numFilesRenamed = 0;
 
@@ -29,15 +34,13 @@ module.exports = function(grunt) {
       grunt.file.expand({filter: 'isFile'}, files).sort().forEach(function(f) {
         var version = forceVersion || hash(f).slice(0, 8),
           basename = path.basename(f),
-          parts = basename.split('.'),
-          renamedBasename,
-          renamedPath;
+          parts = basename.split('.');
 
         // inject the version just before the file extension
         parts.splice(parts.length-1, 0, version);
 
-        renamedBasename = parts.join('.');
-        renamedPath = path.join(path.dirname(f), renamedBasename);
+        var renamedBasename = parts.join('.');
+        var renamedPath = path.join(path.dirname(f), renamedBasename);
 
         fs.renameSync(f, renamedPath);
         grunt.verbose.write(f + ' ').ok(renamedBasename);
@@ -48,7 +51,11 @@ module.exports = function(grunt) {
           renamedBasename: renamedBasename,
           renamedPath: renamedPath,
         };
-        simpleVersions[f] = renamedPath;
+
+        var outputversionsSrc = path.relative(baseDir, f);
+        var outputversionsDest = path.relative(baseDir, renamedPath);
+        outputVersions[outputversionsSrc] = outputversionsDest;
+
         numFilesRenamed++;
       });
       grunt.log.write('Renamed ' + numFilesRenamed + ' files ').ok();
@@ -88,11 +95,9 @@ module.exports = function(grunt) {
       }
     });
 
-    if (versionFilePath) {
-      grunt.log.writeln('Writing version file.');
-      grunt.file.write(versionFilePath, JSON.stringify(simpleVersions, null, ' '));
-      grunt.log.write(versionFilePath + ' ').ok();
-    }
+    grunt.log.writeln('Writing version file.');
+    grunt.file.write(versionFilePath, JSON.stringify(outputVersions, null, ' '));
+    grunt.log.write(versionFilePath + ' ').ok();
   };
 
 
