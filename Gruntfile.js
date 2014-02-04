@@ -98,6 +98,12 @@ module.exports = function(grunt) {
     },
   };
 
+  config.bump = {
+    options: {
+      push: false,
+    },
+  };
+
   grunt.initConfig(config);
 
   // Load this tasks's plugins.
