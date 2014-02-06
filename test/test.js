@@ -29,9 +29,9 @@ exports.ver = {
     var contents = grunt.file.read('test/fixtures/out/testBaseDir/version.json');
     var versions = JSON.parse(contents);
     test.deepEqual(versions, {
-      'testBaseDir/static/foo.js': 'testBaseDir/static/foo.d41d8cd9.js',
-      'testBaseDir/static/foo.png': 'testBaseDir/static/foo.d41d8cd9.png',
-      'testBaseDir/static/foo.css': 'testBaseDir/static/foo.5d897631.css',
+      'foo.js': 'foo.d41d8cd9.js',
+      'foo.png': 'foo.d41d8cd9.png',
+      'foo.css': 'foo.8967dedd.css',
     });
     test.done();
   }

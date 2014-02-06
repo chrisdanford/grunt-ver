@@ -94,7 +94,7 @@ module.exports = function(grunt) {
         }
       ],
       versionFile: 'test/fixtures/out/testBaseDir/version.json',
-      baseDir: 'test/fixtures/out',
+      baseDir: 'test/fixtures/out/testBaseDir/static',
     },
   };
 

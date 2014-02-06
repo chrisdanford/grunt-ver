@@ -3,15 +3,18 @@ Copyright (c) 2012 Chris Danford
 Licensed under the MIT license.
 */
 
-var fs = require('fs'),
-  path = require('path'),
-  crypto = require('crypto');
+var fs = require('fs');
+var path = require('path');
+var crypto = require('crypto');
 
 module.exports = function(grunt) {
   var ver, hash;
 
   grunt.registerMultiTask('ver', 'Add hashes to file names and update references to renamed files', function() {
-    var versionFile = this.data.versionFile || this.data.version;  // "version" is the pre 0.3 option name
+    if (this.data.version) {
+      grunt.warn('The option "version" option has been renamed to "versionFile".  Please update your task configuration.');
+    }
+    var versionFile = this.data.versionFile;
     if (!versionFile) {
       grunt.warn('The option "versionFile" is required.');
       return;
@@ -22,22 +25,21 @@ module.exports = function(grunt) {
 
   ver = function(phases, versionFilePath, baseDir, forceVersion) {
     grunt.verbose.or.writeln('Run with --verbose for details.');
-    var versions = {};  // map from original file name to version info
-    var outputVersions = {};
+    var renameInfos = [];  // info about renamed files
 
     phases.forEach(function(phase) {
-      var files = phase.files,
-        references = phase.references,
-        numFilesRenamed = 0;
+      var files = phase.files;
+      var references = phase.references;
+      var numFilesRenamed = 0;
 
       grunt.log.writeln('Versioning files.').writeflags(files);
       grunt.file.expand({filter: 'isFile'}, files).sort().forEach(function(f) {
-        var version = forceVersion || hash(f).slice(0, 8),
-          basename = path.basename(f),
-          parts = basename.split('.');
+        var versionHash = forceVersion || hash(f).slice(0, 8);
+        var basename = path.basename(f);
+        var parts = basename.split('.');
 
-        // inject the version just before the file extension
-        parts.splice(parts.length-1, 0, version);
+        // inject the versionHash just before the file extension
+        parts.splice(parts.length-1, 0, versionHash);
 
         var renamedBasename = parts.join('.');
         var renamedPath = path.join(path.dirname(f), renamedBasename);
@@ -45,16 +47,15 @@ module.exports = function(grunt) {
         fs.renameSync(f, renamedPath);
         grunt.verbose.write(f + ' ').ok(renamedBasename);
 
-        versions[f] = {
-          basename: basename,
-          version: version,
-          renamedBasename: renamedBasename,
-          renamedPath: renamedPath,
-        };
+        var renameFrom = path.relative(baseDir, f);
+        var renameTo = path.relative(baseDir, renamedPath);
+        var renameFromRegex = new RegExp('\\b' + renameFrom + '\\b', 'g');
 
-        var outputversionsSrc = path.relative(baseDir, f);
-        var outputversionsDest = path.relative(baseDir, renamedPath);
-        outputVersions[outputversionsSrc] = outputversionsDest;
+        renameInfos.push({
+          from: renameFrom,
+          fromRegex: renameFromRegex,
+          to: renameTo
+        });
 
         numFilesRenamed++;
       });
@@ -65,25 +66,21 @@ module.exports = function(grunt) {
         var totalReferencingFiles = 0;
         grunt.log.writeln('Replacing references.').writeflags(references);
         grunt.file.expand({filter: 'isFile'}, references).sort().forEach(function(f) {
-          var content = grunt.file.read(f).toString(),
-            replacedToCount = {},
-            replacedKeys;
+          var content = grunt.file.read(f).toString();
+          var replacedToCount = {};
 
-          Object.keys(versions).forEach(function(key) {
-            var to = versions[key],
-              regex = new RegExp('\\b' + to.basename + '\\b', 'g');
-
-            content = content.replace(regex, function(match) {
+          renameInfos.forEach(function(renameInfo) {
+            content = content.replace(renameInfo.fromRegex, function(match) {
               if (match in replacedToCount) {
                 replacedToCount[match]++;
               } else {
                 replacedToCount[match] = 1;
               }
-              return to.renamedBasename;
+              return renameInfo.to;
             });
           });
 
-          replacedKeys = Object.keys(replacedToCount);
+          var replacedKeys = Object.keys(replacedToCount);
           if (replacedKeys.length > 0) {
             grunt.file.write(f, content);
             grunt.verbose.write(f + ' ').ok('replaced: ' + replacedKeys.join(', '));
@@ -95,9 +92,12 @@ module.exports = function(grunt) {
       }
     });
 
-    grunt.log.writeln('Writing version file.');
-    grunt.file.write(versionFilePath, JSON.stringify(outputVersions, null, ' '));
-    grunt.log.write(versionFilePath + ' ').ok();
+    var output = {};
+    renameInfos.forEach(function(renameInfo) {
+      output[renameInfo.from] = renameInfo.to;
+    });
+    grunt.file.write(versionFilePath, JSON.stringify(output, null, ' '));
+    grunt.log.verbose.writeln(versionFilePath + ' ').ok();
   };
 
 
