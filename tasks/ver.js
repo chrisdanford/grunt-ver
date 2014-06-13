@@ -12,13 +12,11 @@ module.exports = function(grunt) {
 
   grunt.registerMultiTask('ver', 'Add hashes to file names and update references to renamed files', function() {
     if (this.data.version) {
-      grunt.warn('The option "version" option has been renamed to "versionFile".  Please update your task configuration.');
-    }
-    var versionFile = this.data.versionFile;
-    if (!versionFile) {
-      grunt.warn('The option "versionFile" is required.');
+      grunt.warn('The option "version" option has been renamed to "versionFile". Please update your task configuration.');
       return;
     }
+    var versionFile = this.data.versionFile;
+
     var baseDir = this.data.baseDir || path.dirname(versionFile);
     ver(this.data.phases, versionFile, baseDir, this.data.forceVersion);
   });
@@ -96,8 +94,11 @@ module.exports = function(grunt) {
     renameInfos.forEach(function(renameInfo) {
       output[renameInfo.from] = renameInfo.to;
     });
-    grunt.file.write(versionFilePath, JSON.stringify(output, null, ' '));
-    grunt.log.verbose.writeln(versionFilePath + ' ').ok();
+
+    if (versionFilePath){
+      grunt.file.write(versionFilePath, JSON.stringify(output, null, ' '));
+      grunt.log.verbose.writeln(versionFilePath + ' ').ok();
+    }
   };
 
 
