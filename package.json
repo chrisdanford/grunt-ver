@@ -1,7 +1,7 @@
 {
   "name": "grunt-ver",
   "description": "Add hashes to file names and update references to renamed files",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "homepage": "https://github.com/chrisdanford/grunt-ver",
   "author": {
     "name": "Chris Danford",

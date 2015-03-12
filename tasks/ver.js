@@ -93,6 +93,26 @@ module.exports = function(grunt) {
     });
 
     var output = {};
+
+    // To enable this task to run incrementally:
+    // Try read the existing version file off of disk.  If it exists,
+    // use its existing map, and append new entries to the map.
+    // Then, prune items where the destination file no longer exists.
+    try {
+      output = JSON.parse(fs.readFileSync(versionFilePath));
+
+      for (var srcFilename in output) {
+        srcFilename = path.relative(baseDir, output[srcFilename]);
+        if (!fs.existsSync(srcFilename)) {
+            delete output[srcFilename];
+        }
+      }
+    } catch (e) {
+        // unable to read file for some reason
+      grunt.log.verbose.writeln('unable to read existing file "' + versionFilePath + '"', e);
+    }
+
+
     renameInfos.forEach(function(renameInfo) {
       output[renameInfo.from] = renameInfo.to;
     });
