@@ -128,7 +128,7 @@ module.exports = function(grunt) {
     var hash = crypto.createHash(algorithm);
 
     grunt.log.verbose.writeln('Hashing ' + filePath + '.');
-    hash.update(grunt.file.read(filePath));
+    hash.update(grunt.file.read(filePath, {encoding: null}));
     return hash.digest(encoding);
   };
 
