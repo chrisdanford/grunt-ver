@@ -26,6 +26,7 @@ module.exports = function(grunt) {
   ver = function(phases, versionFilePath, baseDir, forceVersion) {
     grunt.verbose.or.writeln('Run with --verbose for details.');
     var renameInfos = [];  // info about renamed files
+    var oldToNew = {};
 
     phases.forEach(function(phase) {
       var files = phase.files;
@@ -49,19 +50,17 @@ module.exports = function(grunt) {
 
         var renameFrom = path.relative(baseDir, f);
         var renameTo = path.relative(baseDir, renamedPath);
-        var renameFromRegex = new RegExp('\\b' + renameFrom + '\\b', 'g');
 
-        renameInfos.push({
-          from: renameFrom,
-          fromRegex: renameFromRegex,
-          to: renameTo
-        });
+        oldToNew[renameFrom] = renameTo;
 
         numFilesRenamed++;
       });
+
       grunt.log.write('Renamed ' + numFilesRenamed + ' files ').ok();
 
-      if (references) {
+      if (numFilesRenamed > 0 && references) {
+        var regexp = new RegExp('\\b(' + Object.keys(oldToNew).join('|') + ')\\b', 'g');
+
         var totalReferences = 0;
         var totalReferencingFiles = 0;
         grunt.log.writeln('Replacing references.').writeflags(references);
@@ -69,15 +68,16 @@ module.exports = function(grunt) {
           var content = grunt.file.read(f).toString();
           var replacedToCount = {};
 
-          renameInfos.forEach(function(renameInfo) {
-            content = content.replace(renameInfo.fromRegex, function(match) {
-              if (match in replacedToCount) {
-                replacedToCount[match]++;
-              } else {
-                replacedToCount[match] = 1;
-              }
-              return renameInfo.to;
-            });
+          content = content.replace(regexp, function(match) {
+            if (match in replacedToCount) {
+              replacedToCount[match]++;
+            } else {
+              replacedToCount[match] = 1;
+            }
+            if (!oldToNew.hasOwnProperty(match)) {
+              throw 'unexpected match: ' + match;
+            }
+            return oldToNew[match];
           });
 
           var replacedKeys = Object.keys(replacedToCount);
@@ -112,11 +112,7 @@ module.exports = function(grunt) {
       grunt.log.verbose.writeln('unable to read existing file "' + versionFilePath + '"', e);
     }
 
-
-    renameInfos.forEach(function(renameInfo) {
-      output[renameInfo.from] = renameInfo.to;
-    });
-    grunt.file.write(versionFilePath, JSON.stringify(output, null, ' '));
+    grunt.file.write(versionFilePath, JSON.stringify(oldToNew, null, ' '));
     grunt.log.verbose.writeln(versionFilePath + ' ').ok();
   };
 
