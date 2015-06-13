@@ -98,6 +98,7 @@ All file paths inside of `versionFile` will be relative to `baseDir`.
 
 
 ## Release History
+* 2015-06-13 0.5.3  Optimize reference replacement.
 * 2014-02-06 0.5.0  When updating references, find/replace longer filepaths instead of shorter basenames.  Using the old `version` option now generates a warning.
 * 2014-02-03 0.3.0  Added `baseDir` option.  Filepaths in versionFile are now relative to the directory of the versionFile.  The `version` option was renamed to `versionFile`.
 
